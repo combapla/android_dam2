@@ -1,17 +1,20 @@
 package com.example.proyectoandroid.login
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Scaffold { paddingValues ->
         Column(
@@ -31,8 +34,8 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = email,
+                onValueChange = { email = it },
                 label = { Text("Correo electrónico") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -41,8 +44,8 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = password,
+                onValueChange = { password = it },
                 label = { Text("Contraseña") },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
@@ -52,11 +55,25 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = {},
+                onClick = {
+                    viewModel.login(email, password)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Entrar")
             }
+
+            // Observamos el estado del usuario para navegar
+            val usuario by viewModel.usuario.collectAsState()
+            LaunchedEffect(usuario) {
+                if (usuario != null) {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            }
+
+
         }
     }
 }
