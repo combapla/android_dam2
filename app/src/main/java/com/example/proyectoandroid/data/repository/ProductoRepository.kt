@@ -22,7 +22,6 @@ class ProductoRepository(private val dao: ProductoDao) {
         return dao.getProductoPorId(id)
     }
 
-
     fun getProductoSync(id: Int): ProductoEntity? {
 
         return null
