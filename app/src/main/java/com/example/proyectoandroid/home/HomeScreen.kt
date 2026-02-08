@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.proyectoandroid.data.model.UsuarioEntity
@@ -21,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.proyectoandroid.data.model.ProductoEntity
+import com.example.proyectoandroid.network.NetworkConnectivityObserver
+import com.example.proyectoandroid.ui.components.NetworkStatusBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +35,10 @@ fun HomeScreen(
     val productos by viewModel.productos.collectAsState(initial = emptyList())
     var showDialog by remember { mutableStateOf(false) }
     var selectedProducto by remember { mutableStateOf<ProductoEntity?>(null) }
+    
+    val context = LocalContext.current
+    val networkObserver = remember { NetworkConnectivityObserver(context) }
+    val isConnected by networkObserver.isConnected.collectAsState(initial = true)
 
     Scaffold(
         floatingActionButton = {
@@ -45,37 +52,42 @@ fun HomeScreen(
     ) { paddingValues ->
         Column(
             Modifier
+                .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)) {
-            Text(
-                text = "Hola ${usuario.correo}",
-                style = MaterialTheme.typography.headlineSmall
-            )
+        ) {
+            NetworkStatusBar(isConnected = isConnected)
+            
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    text = "Hola ${usuario.correo}",
+                    style = MaterialTheme.typography.headlineSmall
+                )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            LazyColumn {
-                items(productos) { producto ->
-                    ListItem(
-                        headlineContent = { Text(producto.nombre) },
-                        supportingContent = { Text("${producto.precio}€") },
-                        trailingContent = {
-                            Row {
-                                IconButton(onClick = {
-                                    selectedProducto = producto
-                                    showDialog = true
-                                }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Editar")
+                LazyColumn {
+                    items(productos) { producto ->
+                        ListItem(
+                            headlineContent = { Text(producto.nombre) },
+                            supportingContent = { Text("${producto.precio}€") },
+                            trailingContent = {
+                                Row {
+                                    IconButton(onClick = {
+                                        selectedProducto = producto
+                                        showDialog = true
+                                    }) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Editar")
+                                    }
+                                    IconButton(onClick = { viewModel.eliminarProducto(producto) }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                                    }
                                 }
-                                IconButton(onClick = { viewModel.eliminarProducto(producto) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                                }
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("detail/${producto.id}")
                             }
-                        },
-                        modifier = Modifier.clickable {
-                            navController.navigate("detail/${producto.id}")
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
