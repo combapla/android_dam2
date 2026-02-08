@@ -37,4 +37,3 @@ fun DetailScreen(producto: ProductoEntity) {
         Text("Precio: ${producto.precio} €")
     }
 }
-
