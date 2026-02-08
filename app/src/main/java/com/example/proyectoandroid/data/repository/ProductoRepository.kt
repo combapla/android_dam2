@@ -1,4 +1,4 @@
-    package com.example.proyectoandroid.data.repository
+package com.example.proyectoandroid.data.repository
 
     import com.example.proyectoandroid.data.dao.ProductoDao
     import com.example.proyectoandroid.data.model.ProductoEntity
@@ -9,7 +9,7 @@
         suspend fun insertarProducto(producto: ProductoEntity) {
             dao.insertarProducto(producto)
         }
-    
+
         suspend fun actualizarProducto(producto: ProductoEntity) {
             dao.actualizarProducto(producto)
         }
