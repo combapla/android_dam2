@@ -56,7 +56,7 @@ fun AppNavigation() {
             val producto = productos.find { it.id == id }
 
             producto?.let {
-                DetailScreen(it)
+                DetailScreen(it, navController)
             }
         }
     }
